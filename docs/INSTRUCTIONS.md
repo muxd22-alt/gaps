@@ -1,25 +1,55 @@
-# OpenClaw Project: Mimic & Knowledge Assistant
+# 🦞 OpenClaw Master Boot Instructions: Mimic & Knowledge System
 
-## Current Objectives
-1. **Telegram Link Summarization**:
-   - Whenever a link is shared in Telegram, I must summarize it.
-   - Summaries should be saved to `d:\AI_PROJECTS\knowledge\summaries\{title}.md`.
-   - Categories should be automatically determined and stored in subfolders if possible.
+## 🎯 System Mission
+To automate the capture and analysis of market insights from Benjamin Cowen (Into the Cryptoverse), maintain a persistent Knowledge Base from shared Telegram links, and identify learning gaps through an automated Gaps Analyzer.
 
-2. **Knowledge Gaps & Flashcards**:
-   - Monitor `d:\AI_PROJECTS\knowledge` for new content.
-   - Periodically (or upon request) analyze shared content to find "missing knowledge" based on Benjamin Cowen's market theories (e.g., Risk Levels, Bull Market Support Bands).
-   - Generate flashcards in `d:\AI_PROJECTS\gaps\flashcards.md`.
+---
 
-3. **Mimic Dashboard Monitoring**:
-   - The cron job `Mimic_Tracker` handles the YouTube scraping.
-   - If I see errors in `d:\AI_PROJECTS\projects\daily-brief\data\errors.log`, I should attempt to fix the `tracker.py` script.
+## 🏗️ Project Architecture
 
-## System Settings
-- **Heartbeat**: Frequency set to 30m. Reports should go to the #heartbeat chat if possible (or just labeled clearly).
-- **Skills**: Use `find-skills` for new tasks, `gitflow` for repo pushes, `self-improvement` for error learning, and `ui-ux-pro-max` for dashboard styling.
+### 1. Mimic Dashboard (Daily Brief)
+- **Path**: `d:\AI_PROJECTS\projects\daily-brief`
+- **Repo**: [github.com/muxd22-alt/mimic](https://github.com/muxd22-alt/mimic)
+- **Goal**: Track YouTube videos, pull transcripts, and generate "mimicry training" data.
+- **Training Data**: Stored in `data/training_json/`. Every video is converted into a structured Instruction/Input/Output JSON for future model fine-tuning or RAG-based mimicking of Benjamin's analysis style.
+- **Frontend**: Premium Cyberpunk/HUD design located in `docs/` for GitHub Pages.
 
-## Knowledge Base Structure
-- Path: `d:\AI_PROJECTS\knowledge`
-- Tracker Script: `d:\AI_PROJECTS\projects\daily-brief\scripts\tracker.py`
-- Gaps Repo: `d:\AI_PROJECTS\gaps`
+### 2. Knowledge Base
+- **Path**: `d:\AI_PROJECTS\knowledge`
+- **Goal**: Every link shared in Telegram MUST be summarized using the local LLM.
+- **Storage**: Markdown summaries stored in `knowledge/summaries/`.
+- **Instruction**: When a link is detected, extract content, summarize key takeaways, and categorize into subfolders (e.g., BTC, Macro, ETH).
+
+### 3. Gaps Analyzer
+- **Path**: `d:\AI_PROJECTS\gaps`
+- **Repo**: [github.com/muxd22-alt/gaps](https://github.com/muxd22-alt/gaps)
+- **Goal**: Compare `knowledge/summaries` against Benjamin's "Essential Topic List" (Risk Levels, Bull Market Support Bands, Logarithmic Regression).
+- **Output**: Generates a web-based dashboard in `docs/` showing flashcards for missing knowledge.
+
+---
+
+## 🎨 UI/UX Standards (CRITICAL)
+- **Skill**: ALWAYS consult `skills/ui-ux-pro-max` before modifying frontends.
+- **Style**: Retro-Futurism / Cyberpunk.
+- **Colors**: OLED Black (#050505), Neon Blue (#00f3ff), Neon Pink (#ff00ff).
+- **Vibe**: Performance-driven, technical, HUD-inspired.
+
+---
+
+## ⚙️ Operational Workflows
+1. **Cron 1 (Mimic_Tracker - Hourly)**:
+   - Run `scripts/tracker.py` to fetch new videos and transcripts.
+   - Run `scripts/site_generator.py` to update the web dashboard.
+2. **Cron 2 (Knowledge_Gaps_Sync - 4-Hourly)**:
+   - Move new Telegram summaries to the knowledge repo.
+   - Run `analyzer.py` in the gaps folder.
+   - Push all updates to GitHub.
+
+## 🛠️ Skills in Use
+- `find-skills`: To discover new OpenClaw features.
+- `gitflow`: To manage deployments to the `mimic` and `gaps` repos.
+- `self-improvement`: To log and fix errors in the tracker or analyzer.
+- `ui-ux-pro-max`: To maintain the premium aesthetic.
+
+---
+*Last Updated: 2026-03-14 | Automated by OpenClaw AI*
