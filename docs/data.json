@@ -1,41 +1,52 @@
 {
     "gaps": [
         {
-            "title": "Gap: Bull Market Support Band",
-            "preview": "You haven't shared enough data regarding Bull Market Support Band. We need to study this more.",
+            "title": "Bull Market Support Band",
+            "question": "What is the significance of the Bull Market Support Band in the current market cycle?",
+            "answer": "The combination of the 20-week SMA and 21-week EMA that historically acts as support in bull markets.",
             "type": "Flashcard",
-            "tag": "Missing"
+            "status": "Missing",
+            "next_review": "2026-03-14T04:43:51.505065"
         },
         {
-            "title": "Gap: Logarithmic Regression",
-            "preview": "You haven't shared enough data regarding Logarithmic Regression. We need to study this more.",
+            "title": "Logarithmic Regression",
+            "question": "What is the significance of the Logarithmic Regression in the current market cycle?",
+            "answer": "A mathematical model used to determine the fair value of Bitcoin over time based on diminishing returns.",
             "type": "Flashcard",
-            "tag": "Missing"
+            "status": "Missing",
+            "next_review": "2026-03-14T04:43:51.505065"
         },
         {
-            "title": "Gap: Bitcoin Risk Levels",
-            "preview": "You haven't shared enough data regarding Bitcoin Risk Levels. We need to study this more.",
+            "title": "Bitcoin Risk Levels",
+            "question": "What is the significance of the Bitcoin Risk Levels in the current market cycle?",
+            "answer": "A metric from 0 to 1 based on logarithmic regression that indicates market heat (0-0.3 is accumulation, 0.7-1.0 is peak).",
             "type": "Flashcard",
-            "tag": "Missing"
+            "status": "Missing",
+            "next_review": "2026-03-14T04:43:51.505065"
         },
         {
-            "title": "Gap: ETH/BTC Ratio",
-            "preview": "You haven't shared enough data regarding ETH/BTC Ratio. We need to study this more.",
+            "title": "ETH/BTC Ratio",
+            "question": "What is the significance of the ETH/BTC Ratio in the current market cycle?",
+            "answer": "The valuation of Ethereum in terms of Bitcoin, often used to signal alt-season or flight to safety.",
             "type": "Flashcard",
-            "tag": "Missing"
+            "status": "Missing",
+            "next_review": "2026-03-14T04:43:51.505065"
         },
         {
-            "title": "Gap: Dollar Cost Averaging (DCA) Strategy",
-            "preview": "You haven't shared enough data regarding Dollar Cost Averaging (DCA) Strategy. We need to study this more.",
+            "title": "Macro Backdrop",
+            "question": "What is the significance of the Macro Backdrop in the current market cycle?",
+            "answer": "The overall economic environment, including FED interest rates and SP500 performance, impacting all risk assets.",
             "type": "Flashcard",
-            "tag": "Missing"
-        },
-        {
-            "title": "Gap: Macro Backdrop",
-            "preview": "You haven't shared enough data regarding Macro Backdrop. We need to study this more.",
-            "type": "Flashcard",
-            "tag": "Missing"
+            "status": "Missing",
+            "next_review": "2026-03-14T04:43:51.505065"
         }
     ],
-    "knowledge": []
+    "knowledge": [],
+    "categories": [
+        "ECONOMICS",
+        "CRYPTO",
+        "MATHEMATICS",
+        "FED",
+        "SP500"
+    ]
 }
