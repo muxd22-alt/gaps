@@ -2,7 +2,8 @@ import os
 import json
 
 KNOWLEDGE_DIR = "d:/AI_PROJECTS/knowledge/summaries"
-GAPS_FILE = "d:/AI_PROJECTS/gaps/flashcards.md"
+GAPS_DATA_FILE = "d:/AI_PROJECTS/gaps/docs/data.json"
+FLASHCARDS_MD = "d:/AI_PROJECTS/gaps/flashcards.md"
 
 REQUIRED_TOPICS = [
     "Bull Market Support Band",
@@ -14,30 +15,51 @@ REQUIRED_TOPICS = [
 ]
 
 def analyze_gaps():
-    if not os.path.exists(KNOWLEDGE_DIR):
-        print("Knowledge base is empty.")
-        return
-
-    shared_content = ""
-    for filename in os.listdir(KNOWLEDGE_DIR):
-        if filename.endswith(".md"):
-            with open(os.path.join(KNOWLEDGE_DIR, filename), 'r') as f:
-                shared_content += f.read().lower()
+    shared_summaries = []
+    shared_text_blob = ""
+    
+    if os.path.exists(KNOWLEDGE_DIR):
+        for filename in os.listdir(KNOWLEDGE_DIR):
+            if filename.endswith(".md"):
+                with open(os.path.join(KNOWLEDGE_DIR, filename), 'r') as f:
+                    content = f.read()
+                    shared_text_blob += content.lower()
+                    shared_summaries.append({
+                        "title": filename.replace(".md", ""),
+                        "preview": content[:150] + "...",
+                        "type": "Summary"
+                    })
 
     gaps = []
     for topic in REQUIRED_TOPICS:
-        if topic.lower() not in shared_content:
-            gaps.append(topic)
+        if topic.lower() not in shared_text_blob:
+            gaps.append({
+                "title": f"Gap: {topic}",
+                "preview": f"You haven't shared enough data regarding {topic}. We need to study this more.",
+                "type": "Flashcard",
+                "tag": "Missing"
+            })
 
-    with open(GAPS_FILE, 'w') as f:
-        f.write("# Knowledge Gaps & Flashcards\n\n")
-        f.write("Based on Benjamin Cowen's core market indicators, here are the areas you haven't shared links about yet:\n\n")
-        for gap in gaps:
-            f.write(f"## 🃏 Flashcard: {gap}\n")
-            f.write(f"**Question:** What is the significance of the {gap} in the current market cycle?\n")
-            f.write(f"**Answer:** (LLM will fill this based on historical Benjamin Cowen data in next iteration)\n\n")
+    # Save to JSON for dashboard
+    output = {
+        "gaps": gaps,
+        "knowledge": shared_summaries
+    }
     
-    print(f"Analyzed knowledge. Found {len(gaps)} gaps.")
+    docs_dir = os.path.dirname(GAPS_DATA_FILE)
+    if not os.path.exists(docs_dir):
+        os.makedirs(docs_dir)
+
+    with open(GAPS_DATA_FILE, 'w') as f:
+        json.dump(output, f, indent=4)
+    
+    # Also keep the markdown version for manual reading
+    with open(FLASHCARDS_MD, 'w') as f:
+        f.write("# Knowledge Gaps & Flashcards\n\n")
+        for g in gaps:
+            f.write(f"## 🃏 {g['title']}\n{g['preview']}\n\n")
+    
+    print(f"Analysis complete. Found {len(gaps)} gaps and {len(shared_summaries)} summaries.")
 
 if __name__ == "__main__":
     analyze_gaps()
