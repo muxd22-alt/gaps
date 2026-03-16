@@ -1,55 +1,72 @@
-async function loadDashboard() {
-    const gapsContainer = document.getElementById('gaps-container');
-    const knowledgeContainer = document.getElementById('knowledge-container');
-
+document.addEventListener('DOMContentLoaded', async () => {
+    let cards = [];
+    let currentIndex = 0;
+    
+    const container = document.getElementById('flashcard-container');
+    const controls = document.getElementById('controls');
+    
     try {
-        const response = await fetch('data.json');
-        const data = await response.json();
-
-        // Render Gaps (Flashcards with Answers)
-        if (data.gaps.length === 0) {
-            gapsContainer.innerHTML = '<p>No active gaps! System synchronized.</p>';
-        } else {
-            gapsContainer.innerHTML = data.gaps.map((gap, index) => `
-                <div class="card srs-card" onclick="this.classList.toggle('flipped')">
-                    <div class="card-inner">
-                        <div class="card-front">
-                            <div class="card-type">${gap.status}</div>
-                            <div class="card-title">${gap.title}</div>
-                            <div class="card-body">${gap.question}</div>
-                            <div class="hint">Click to flip for answer</div>
-                        </div>
-                        <div class="card-back">
-                            <div class="card-title">Analysis</div>
-                            <div class="card-body">${gap.answer}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Render Knowledge (With Value Flags & Categories)
-        if (data.knowledge.length === 0) {
-            knowledgeContainer.innerHTML = '<p>No analysis found. Run tracker.py.</p>';
-        } else {
-            knowledgeContainer.innerHTML = data.knowledge.map(item => `
-                <div class="card" style="border-left: 4px solid var(--accent-secondary)">
-                    <div class="card-header-flex">
-                        <div class="card-type">${item.type}</div>
-                        ${item.value_flag === 'HIGH' ? '<span class="value-flag">🔥 High Value</span>' : ''}
-                    </div>
-                    <div class="card-title">${item.title}</div>
-                    <div class="card-body">${item.preview}</div>
-                    <div class="category-tags">
-                        ${(item.categories || []).map(cat => `<span class="cat-badge">${cat}</span>`).join('')}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-    } catch (e) {
-        console.error("Dashboard error:", e);
+        const res = await fetch('data.json');
+        if (!res.ok) throw new Error("No data found");
+        cards = await res.json();
+    } catch {
+        cards = [
+            { category: "SYSTEM", question: "Looks like there are no active flashcards right now.", answer: "The Gaps analyzer creates these from your Mimic and Sumzy data." }
+        ];
     }
-}
-
-document.addEventListener('DOMContentLoaded', loadDashboard);
+    
+    function renderCard(index) {
+        container.innerHTML = '';
+        if (index >= cards.length) {
+            container.innerHTML = `
+                <div class="flashcard">
+                    <div class="front">
+                        <h2>All done for today! 🎉</h2>
+                        <p style="color:var(--text-sec); margin-top:10px;">Check back later after new videos or links are analyzed.</p>
+                    </div>
+                </div>
+            `;
+            controls.style.display = 'none';
+            controls.classList.remove('visible');
+            return;
+        }
+        
+        const c = cards[index];
+        const cardEl = document.createElement('div');
+        cardEl.className = 'flashcard';
+        cardEl.innerHTML = `
+            <div class="front">
+                <span class="category">${c.category || 'KNOWLEDGE'}</span>
+                <h2>${c.question}</h2>
+                <span style="position:absolute; bottom:20px; color:var(--text-sec); font-size: 0.8rem;">Tap to reveal</span>
+            </div>
+            <div class="back">
+                <span class="category">${c.category || 'KNOWLEDGE'}</span>
+                <p>${c.answer}</p>
+            </div>
+        `;
+        
+        cardEl.addEventListener('click', () => {
+            cardEl.classList.toggle('flipped');
+            if (cardEl.classList.contains('flipped')) {
+                controls.style.display = 'flex';
+                // Trigger reflow for animation
+                setTimeout(() => controls.classList.add('visible'), 50);
+            } else {
+                controls.classList.remove('visible');
+            }
+        });
+        
+        container.appendChild(cardEl);
+        controls.style.display = 'none';
+        controls.classList.remove('visible');
+    }
+    
+    document.getElementById('btn-pass').addEventListener('click', () => { currentIndex++; renderCard(currentIndex); });
+    document.getElementById('btn-fail').addEventListener('click', () => {
+        // In a real SRS this would reset the timing algorithm
+        currentIndex++; renderCard(currentIndex); 
+    });
+    
+    renderCard(0);
+});

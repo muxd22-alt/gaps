@@ -3,33 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaps & Knowledge | Learning Dashboard</title>
+    <title>Gaps | SRS Knowledge Tester</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Knowledge Vault & Gaps</h1>
-        <p class="subtitle">Summarizing shared links and identifying learning opportunities.</p>
-    </header>
+    <div class="header">
+        <h1>Gaps<span>📘</span></h1>
+        <p>Testing your knowledge from Mimic and Sumzy.</p>
+    </div>
 
-    <main>
-        <div class="section-title">Knowledge Gaps & Flashcards</div>
-        <div class="card-grid" id="gaps-container">
-            <!-- Gaps will be loaded here -->
-        </div>
-
-        <div class="section-title">Latest Knowledge Summaries</div>
-        <div class="card-grid" id="knowledge-container">
-            <!-- Knowledge will be loaded here -->
-        </div>
+    <main class="flashcard-container" id="flashcard-container">
+        <!-- JS injects flashcard deck here -->
     </main>
 
-    <footer>
-        &copy; 2026 OpenClaw AI Mastery System. Tracking Gaps for Growth.
-    </footer>
+    <div class="controls" id="controls" style="display:none;">
+        <button id="btn-pass" class="btn pass">I Knew It</button>
+        <button id="btn-fail" class="btn fail">Needs Review</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
