@@ -1,12 +1,15 @@
-# 📘 Gaps Knowledge Tester
+# Gaps Knowledge Analyzer
+# Tests your knowledge by creating flashcards from daily briefs and sumzy data
 
-A self-hosted, offline-first Knowledge Tester that forces you to retain insights via Spaced Repetition Sequencing (SRS).
+## How it works:
+1. Reads recent daily-brief content (market analysis, YouTube channel data)
+2. Cross-references with sumzy insights and dashboards
+3. Identifies topics where you might need review
+4. Generates targeted flashcards for study sessions
+5. Updates your dashboard with new knowledge gaps
 
-## Mission
-To consolidate knowledge gathered dynamically from your Mimic (`daily-brief`) and Sumzy (`telegram-catcher`) pipelines. It generates flashcards and presents them in an elegant, Dark Academia-styled notebook.
-
-## Run It
-Automatically triggered by the OpenClaw 10-Minute sweep, or run manually:
-```bash
-python analyzer.py
-```
+## Sample Data Sources:
+- Market analysis from Telegram links
+- YouTube daily briefs (cryptoverse channel)
+- Sumzy project insights and charts
+- Knowledge tracking dashboards
