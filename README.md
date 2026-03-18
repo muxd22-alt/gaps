@@ -1,3 +1,7 @@
+> [!IMPORTANT]
+> **🚀 SECURITY PROTOCOL: NEVER SHARE SECRETS IN OPENCLAW!**
+> Do not commit API keys, Bot Tokens, or secrets. Use .gitignore!
+
 # Gaps Knowledge Analyzer
 # Tests your knowledge by creating flashcards from daily briefs and sumzy data
 
