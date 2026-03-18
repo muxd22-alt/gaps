@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Run test for Gaps Analyzer"""
 import sys
+import os
 sys.path.insert(0, "D:/AI_PROJECTS/projects")
 os.chdir("D:/AI_PROJECTS/projects/gaps")
 

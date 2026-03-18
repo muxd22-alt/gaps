@@ -1,0 +1,13 @@
+{
+  "name": "gaps-knowledge-analyzer",
+  "version": "1.0.0",
+  "description": "Tests your knowledge by creating flashcards from daily briefs and sumzy data",
+  "main": "analyzer.py",
+  "scripts": {
+    "start": "python analyzer.py",
+    "test": "python run_test.py",
+    "analyze": "python analyzer.py"
+  },
+  "author": "",
+  "license": "ISC"
+}
