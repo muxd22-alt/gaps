@@ -1,8 +1,8 @@
-# Knowledge Gaps Dashboard - Update 2026-03-21 22:20
+# Knowledge Gaps Dashboard - Update 2026-03-21 22:41
 
 ## Analysis Results
 - **Total Flashcards Generated**: 4
-- **Categories Covered**: market_analysis, sumzy_data, youtube_briefs
+- **Categories Covered**: youtube_briefs, sumzy_data, market_analysis
 - **Difficulty Breakdown**:
   - `Basic`: 1 items
   - `Intermediate`: 1 items
