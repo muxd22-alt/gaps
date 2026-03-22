@@ -1,22 +1,29 @@
 #!/usr/bin/env python3
 """
-Gaps Knowledge Analyzer - Final Version
+Gaps Knowledge Analyzer - Final Version (V5)
 Tests your understanding of daily briefs, market analysis, and sumzy data.
+Automatically reads from sibling project directories at D:\AI_PROJECTS\projects.
+Saves flashcards into docs/data.json and updates knowledge_gaps_dashboard.md.
+Now includes git_push to ensure GitHub Pages updates automatically.
 """
 
 import json
 import os
+import subprocess
 from datetime import datetime
 from pathlib import Path
+import re
 
 class GapsAnalyzer:
     """Analyzes knowledge gaps based on daily-brief content."""
     
-    def __init__(self, project_dir: str = r"D:\AI_PROJECTS\projects\gaps"):
-        self.project_dir = Path(project_dir)
-        self.daily_brief = self.project_dir / "daily-brief"
-        self.sumzy_data = self.project_dir / "sumzy"
-        self.docs = self.project_dir / "docs"
+    def __init__(self, projects_root: str = r"D:\AI_PROJECTS\projects"):
+        self.projects_root = Path(projects_root)
+        self.gaps_dir = self.projects_root / "gaps"
+        self.daily_brief_data = self.projects_root / "daily-brief" / "docs" / "data.json"
+        self.sumzy_data = self.projects_root / "sumzy" / "docs" / "data.json"
+        self.docs = self.gaps_dir / "docs"
+        self.data_json = self.docs / "data.json"
         
         # Knowledge domains to test
         self.domains = {
@@ -26,226 +33,168 @@ class GapsAnalyzer:
             "general_knowledge": {"weight": 0.10, "topics": ["knowledge gaps", "flashcards"]}
         }
     
+    def git_push(self):
+        """Stage, commit, and push if there are changes."""
+        try:
+            subprocess.run(["git", "add", "-A"], cwd=self.gaps_dir, capture_output=True)
+            diff = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=self.gaps_dir)
+            
+            if diff.returncode != 0:
+                msg = f"auto: gaps dashboard update {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                subprocess.run(["git", "commit", "-m", msg], cwd=self.gaps_dir, capture_output=True)
+                print("🚀 Committing changes...")
+                
+                push_res = subprocess.run(["git", "push", "origin", "HEAD"], cwd=self.gaps_dir, capture_output=True, text=True)
+                if push_res.returncode == 0:
+                    print("📤 Pushed to GitHub.")
+                    return True
+                else:
+                    print(f"⚠️ Push failed: {push_res.stderr}")
+                    return False
+            else:
+                print("✅ No changes to push.")
+                return False
+        except Exception as e:
+            print(f"⚠️ Git push error: {e}")
+            return False
+
+    def normalize_json(self, data):
+        """Standardize to a list of entries, whether source was [..] or { 'data': [..] }."""
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            if "data" in data:
+                return data["data"]
+            if "briefs" in data:
+                return data["briefs"]
+            # Fallback to dictionary values if it's some other non-standard wrapper
+            return list(data.values())[0] if len(data) == 1 else []
+        return []
+
     def load_content(self) -> dict:
-        """Load and parse content from daily-brief folder."""
+        """Load and parse content from daily-brief and sumzy."""
         content = {
             "timestamp": datetime.now().isoformat(),
-            "files_processed": 0,
-            "topics_found": [],
+            "daily_brief_count": 0,
+            "sumzy_count": 0,
             "raw_data": []
         }
         
-        # Check for any files in the folders
-        if self.daily_brief.exists():
+        # Load Daily Brief data
+        if self.daily_brief_data.exists():
             try:
-                files = list(self.daily_brief.glob("*"))[:5]  # Limit to first 5 files
-                content["files_processed"] = len(files)
-                
-                for file_path in files:
-                    if file_path.suffix.lower() in [".md", "", "json"]:
-                        try:
-                            text = file_path.read_text(encoding="utf-8")[:2000]
+                with open(self.daily_brief_data, "r", encoding="utf-8") as f:
+                    content_str = f.read().strip()
+                    if content_str:
+                        db_data = self.normalize_json(json.loads(content_str))
+                        content["daily_brief_count"] = len(db_data)
+                        # Process latest 20 items
+                        for item in db_data[:20]:
                             content["raw_data"].append({
-                                "file": str(file_path),
-                                "length": len(text),
-                                "preview": text.split("\n")[:3]
+                                "source": "daily-brief",
+                                "title": item.get("title", ""),
+                                "preview": item.get("analysis", {}).get("summary", "")[:300]
                             })
-                        except Exception as e:
-                            print(f"Error reading {file_path}: {e}")
             except Exception as e:
-                print(f"Error listing daily-brief files: {e}")
+                print(f"Error loading daily-brief data: {e}")
         
-        # Check sumzy data
+        # Load Sumzy data
         if self.sumzy_data.exists():
             try:
-                for file in list(self.sumzy_data.glob("*"))[:3]:
-                    if file.is_file() and "__pycache__" not in str(file):
-                        content["raw_data"].append({
-                            "file": f"sumzy/{file.name}",
-                            "exists": True
-                        })
+                with open(self.sumzy_data, "r", encoding="utf-8") as f:
+                    content_str = f.read().strip()
+                    if content_str:
+                        s_data = self.normalize_json(json.loads(content_str))
+                        content["sumzy_count"] = len(s_data)
+                        for item in s_data[:20]:
+                            content["raw_data"].append({
+                                "source": "sumzy",
+                                "title": item.get("title", ""),
+                                "preview": item.get("summary", "")[:300]
+                            })
             except Exception as e:
-                print(f"Error accessing sumzy data: {e}")
+                print(f"Error loading sumzy data: {e}")
         
         return content
     
     def generate_flashcards(self, raw_content: dict) -> list:
-        """Generate flashcards based on loaded content."""
+        """Generate flashcards for the JS dashboard."""
         flashcards = []
         
-        # Base knowledge questions derived from daily brief format
-        base_questions = [
-            {
-                "front": "What is the primary purpose of the daily-brief tracker?",
-                "back": "To organize and analyze content from @intothecryptoverse YouTube channel for market analysis purposes.",
-                "category": "youtube_briefs"
-            },
-            {
-                "front": "What does the 'mimic' project track?",
-                "back": "Daily brief dashboard that tracks YouTube channel content and will be remade with future data when Benjamin stops content.",
-                "category": "market_analysis"
-            },
-            {
-                "front": "What is the significance of 'Benjamin' in the context of this project?",
-                "back": "The original creator who will no longer produce YouTube content, necessitating a new brief tracker that can be remade.",
-                "category": "youtube_briefs"
-            },
-            {
-                "front": "What does 'sumzy' represent in this ecosystem?",
-                "back": "A library for storing insights, organizing dashboards, and maintaining structured data from market analysis.",
-                "category": "sumzy_data"
-            },
-            {
-                "front": "What is the primary communication platform used for sharing links?",
-                "back": "Telegram - it's where most Telegram links are shared that feed into the analysis tools.",
-                "category": "general_knowledge"
-            },
-            {
-                "front": "What deployment method is preferred for dashboards?",
-                "back": "GitHub Pages - used for static site hosting of analysis results.",
-                "category": "market_analysis"
-            }
-        ]
+        # Base questions
+        flashcards.append({
+            "question": "What is the primary function of the OpenViking Market Analyzer?",
+            "answer": "To provide structured technical and macro analysis of daily market movements.",
+            "category": "SYSTEM"
+        })
         
-        # Generate questions based on raw content
-        if raw_content["raw_data"]:
-            topics = set()
-            for item in raw_content["raw_data"]:
-                topic_preview = " ".join(item.get("preview", [])[:2])
-                if len(topic_preview) > 5:
-                    # Extract potential keywords (simplified)
-                    words = topic_preview.lower().split()
-                    topics.update(w for w in words if len(w) > 3 and not w.startswith("http") and not w.endswith("."))
-            
-            flashcards.extend(base_questions)
-        
-        # Add category-specific questions
-        domain_flashcards = [
-            {
-                "front": "What data sources feed into the market analysis tools?",
-                "back": "Telegram links, YouTube daily briefs, and sumzy project insights.",
-                "category": "market_analysis"
-            },
-            {
-                "front": "How are dashboards deployed in this system?",
-                "back": "Using GitHub Pages for static site hosting of analysis results.",
-                "category": "market_analysis"
-            },
-            {
-                "front": "What format is used for daily brief tracking?",
-                "back": "Markdown with structured headers and data tables.",
-                "category": "youtube_briefs"
-            },
-            {
-                "front": "Where are sumzy insights stored?",
-                "back": "In the D:\\AI_PROJECTS\\projects\\sumzy directory as a library for structured analysis.",
-                "category": "sumzy_data"
-            }
-        ]
-        
-        flashcards.extend(domain_flashcards)
+        # Dynamic questions from content
+        for item in raw_content["raw_data"]:
+            title = item.get("title", "")
+            if title and len(title) > 8:
+                source_label = "brief" if item["source"] == "daily-brief" else "Telegram Link"
+                flashcards.append({
+                    "question": f"Key takeaway from the {source_label}: '{title}'?",
+                    "answer": f"{item.get('preview', 'Refer to original document for full analysis.')}...",
+                    "category": "DAILY_BRIEF" if item["source"] == "daily-brief" else "SUMZY"
+                })
         
         return flashcards
     
-    def test_knowledge(self, flashcards: list) -> dict:
-        """Test knowledge and generate results."""
-        import random
+    def update_files(self, flashcards: list, results: dict):
+        """Update both data.json and the dashboard markdown file."""
+        os.makedirs(self.docs, exist_ok=True)
         
-        if not flashcards:
-            return {"error": "No flashcards generated", "score": 0}
-        
-        # Simulate a quiz (without actual user input for automation)
-        test_results = {
-            "total_flashcards": len(flashcards),
-            "categories_covered": list(set(fc["category"] for fc in flashcards)),
-            "difficulty_distribution": {},
-            "recommended_review": []
-        }
-        
-        # Analyze category coverage
-        category_counts = {}
-        for fc in flashcards:
-            cat = fc["category"]
-            category_counts[cat] = category_counts.get(cat, 0) + 1
-        
-        test_results["difficulty_distribution"] = {
-            "basic": len([fc for fc in flashcards if "format" in fc["front"].lower()]),
-            "intermediate": len([fc for fc in flashcards if "track" in fc["front"].lower() or "analyze" in fc["front"].lower()]),
-            "advanced": len([fc for fc in flashcards if "remade" in fc["back"].lower()])
-        }
-        
-        # Generate recommendations
-        for cat, count in category_counts.items():
-            test_results["recommended_review"].append({
-                "category": cat,
-                "priority": "high" if count < 2 else "medium",
-                "reason": f"Review {cat} concepts to strengthen understanding"
-            })
-        
-        return test_results
-    
-    def update_dashboard(self, results: dict, output_dir: str = "docs"):
-        """Update the knowledge gaps dashboard."""
-        os.makedirs(output_dir, exist_ok=True)
-        
-        # Create updated dashboard file
-        dashboard_content = f"""# Knowledge Gaps Dashboard - Update {datetime.now().strftime('%Y-%m-%d %H:%M')}
+        # Save flashcards as FLAT LIST for script.js
+        with open(self.data_json, "w", encoding="utf-8") as f:
+            json.dump(flashcards, f, indent=4, ensure_ascii=True)
+            
+        # Update Markdown Dashboard
+        time_str = datetime.now().strftime('%Y-%m-%d %H:%M')
+        content = f"""# Gaps Knowledge Dashboard
+Updated: `{time_str}`
 
-## Analysis Results
-- **Total Flashcards Generated**: {results.get('total_flashcards', 0)}
-- **Categories Covered**: {', '.join(results.get('categories_covered', []))}
-- **Difficulty Breakdown**:
+## Source Health
+- 📺 **Daily Brief Source**: `{"ACTIVE (" + str(results.get('daily_brief_count', 0)) + ")" if self.daily_brief_data.exists() else "MISSING"}`
+- 📡 **Sumzy Source**: `{"ACTIVE (" + str(results.get('sumzy_count', 0)) + ")" if self.sumzy_data.exists() else "MISSING"}`
+
+## Knowledge Coverage
+- **Total Flashcards**: `{len(flashcards)}`
+- **Domains Covered**: {', '.join(set(fc['category'] for fc in flashcards))}
+
+---
+
+## Targeted Improvement Tasks
 """
-        
-        for difficulty, count in results.get("difficulty_distribution", {}).items():
-            dashboard_content += f"  - `{difficulty.capitalize()}`: {count} items\n"
-        
-        dashboard_content += "\n## Recommended Review Areas\n"
-        for rec in results.get("recommended_review", []):
-            priority_marker = "🔴 HIGH" if rec["priority"] == "high" else "🟡 MEDIUM"
-            dashboard_content += f"- {priority_marker}: **{rec['category']}** - {rec['reason']}\n"
-        
-        dashboard_path = self.project_dir / output_dir / "knowledge_gaps_dashboard.md"
-        with open(dashboard_path, "w", encoding="utf-8") as f:
-            f.write(dashboard_content)
-        
-        print(f"Dashboard updated: {dashboard_path}")
-        return dashboard_path
-    
-    def run_analysis(self) -> dict:
-        """Run complete analysis pipeline."""
-        print("Starting Gaps Knowledge Analyzer...")
-        print(f"Project directory: {self.project_dir}")
-        
-        # Load content
-        raw_content = self.load_content()
-        print(f"\nLoaded {raw_content['files_processed']} files from daily-brief")
-        
-        # Generate flashcards
-        flashcards = self.generate_flashcards(raw_content)
-        print(f"Generated {len(flashcards)} flashcards")
-        
-        # Test knowledge
-        test_results = self.test_knowledge(flashcards)
-        
-        # Update dashboard
-        if "error" not in test_results:
-            self.update_dashboard(test_results)
-        
-        return {
-            **test_results,
-            "files_processed": raw_content["files_processed"],
-            "raw_data_items": len(raw_content.get("raw_data", []))
-        }
+        for cat in set(fc['category'] for fc in flashcards):
+            content += f"- 🟡 **{cat}**: Review concepts to ensure consistency.\n"
 
+        content += "\n\n*Dashboard synchronized by OpenViking Gaps Analyzer*"
+        
+        dashboard_path = self.docs / "knowledge_gaps_dashboard.md"
+        with open(dashboard_path, "w", encoding="utf-8") as f:
+            f.write(content)
+        return dashboard_path
+
+    def run_analysis(self):
+        """Execute full pipeline."""
+        print(f"🚀 Gaps Knowledge Synchronizer Started")
+        raw = self.load_content()
+        print(f"  + Scanned Daily Brief: {raw['daily_brief_count']} sources")
+        print(f"  + Scanned Sumzy: {raw['sumzy_count']} sources")
+        
+        flashcards = self.generate_flashcards(raw)
+        print(f"  + Generated {len(flashcards)} knowledge cards")
+        
+        path = self.update_files(flashcards, raw)
+        print(f"✅ Synced flashcards to {self.data_json}")
+        print(f"✅ Dashboard updated: {path}")
+        
+        # PUSH TO GITHUB
+        self.git_push()
+        
+        return flashcards
 
 if __name__ == "__main__":
     analyzer = GapsAnalyzer()
-    results = analyzer.run_analysis()
-    
-    print("\n" + "="*50)
-    print("ANALYSIS COMPLETE")
-    print("="*50)
-    print(f"Files Processed: {results.get('files_processed', 0)}")
-    print(f"Flashcards Generated: {results.get('total_flashcards', 0)}")
-    print(f"Categories Analyzed: {len(results.get('categories_covered', []))}")
+    analyzer.run_analysis()

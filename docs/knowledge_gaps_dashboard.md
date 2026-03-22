@@ -1,14 +1,20 @@
-# Knowledge Gaps Dashboard - Update 2026-03-21 23:05
+# Gaps Knowledge Dashboard
+Updated: `2026-03-22 05:40`
 
-## Analysis Results
-- **Total Flashcards Generated**: 4
-- **Categories Covered**: youtube_briefs, market_analysis, sumzy_data
-- **Difficulty Breakdown**:
-  - `Basic`: 1 items
-  - `Intermediate`: 1 items
-  - `Advanced`: 0 items
+## Source Health
+- 📺 **Daily Brief Source**: `ACTIVE (78)`
+- 📡 **Sumzy Source**: `ACTIVE (2)`
 
-## Recommended Review Areas
-- 🟡 MEDIUM: **market_analysis** - Review market_analysis concepts to strengthen understanding
-- 🔴 HIGH: **youtube_briefs** - Review youtube_briefs concepts to strengthen understanding
-- 🔴 HIGH: **sumzy_data** - Review sumzy_data concepts to strengthen understanding
+## Knowledge Coverage
+- **Total Flashcards**: `23`
+- **Domains Covered**: SUMZY, DAILY_BRIEF, SYSTEM
+
+---
+
+## Targeted Improvement Tasks
+- 🟡 **SUMZY**: Review concepts to ensure consistency.
+- 🟡 **DAILY_BRIEF**: Review concepts to ensure consistency.
+- 🟡 **SYSTEM**: Review concepts to ensure consistency.
+
+
+*Dashboard synchronized by OpenViking Gaps Analyzer*
