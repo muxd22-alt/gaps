@@ -22,11 +22,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="flashcard">
                     <div class="front">
                         <h2>All done for today! 🎉</h2>
-                        <p style="color:var(--text-sec); margin-top:10px;">Check back later after new videos or links are analyzed.</p>
+                        <p style="color:var(--text-sec); margin-top:20px;">Check back later after new videos or links are analyzed.</p>
                     </div>
                 </div>
             `;
-            controls.style.display = 'none';
             controls.classList.remove('visible');
             return;
         }
@@ -38,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="front">
                 <span class="category">${c.category || 'KNOWLEDGE'}</span>
                 <h2>${c.question}</h2>
-                <span style="position:absolute; bottom:20px; color:var(--text-sec); font-size: 0.8rem;">Tap to reveal</span>
+                <span class="tap-hint">Tap to reveal</span>
             </div>
             <div class="back">
                 <span class="category">${c.category || 'KNOWLEDGE'}</span>
@@ -49,23 +48,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         cardEl.addEventListener('click', () => {
             cardEl.classList.toggle('flipped');
             if (cardEl.classList.contains('flipped')) {
-                controls.style.display = 'flex';
-                // Trigger reflow for animation
-                setTimeout(() => controls.classList.add('visible'), 50);
+                // Keep controls invisible until flipped
+                controls.classList.add('visible');
             } else {
                 controls.classList.remove('visible');
             }
         });
         
         container.appendChild(cardEl);
-        controls.style.display = 'none';
         controls.classList.remove('visible');
     }
     
-    document.getElementById('btn-pass').addEventListener('click', () => { currentIndex++; renderCard(currentIndex); });
-    document.getElementById('btn-fail').addEventListener('click', () => {
+    document.getElementById('btn-pass').addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentIndex++; 
+        renderCard(currentIndex); 
+    });
+
+    document.getElementById('btn-fail').addEventListener('click', (e) => {
+        e.stopPropagation();
         // In a real SRS this would reset the timing algorithm
-        currentIndex++; renderCard(currentIndex); 
+        currentIndex++; 
+        renderCard(currentIndex); 
     });
     
     renderCard(0);

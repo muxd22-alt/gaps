@@ -1,5 +1,5 @@
 # Gaps Knowledge Dashboard
-Updated: `2026-03-22 05:40`
+Updated: `2026-03-22 05:42`
 
 ## Source Health
 - 📺 **Daily Brief Source**: `ACTIVE (78)`
@@ -7,14 +7,14 @@ Updated: `2026-03-22 05:40`
 
 ## Knowledge Coverage
 - **Total Flashcards**: `23`
-- **Domains Covered**: SUMZY, DAILY_BRIEF, SYSTEM
+- **Domains Covered**: SYSTEM, DAILY_BRIEF, SUMZY
 
 ---
 
 ## Targeted Improvement Tasks
-- 🟡 **SUMZY**: Review concepts to ensure consistency.
-- 🟡 **DAILY_BRIEF**: Review concepts to ensure consistency.
 - 🟡 **SYSTEM**: Review concepts to ensure consistency.
+- 🟡 **DAILY_BRIEF**: Review concepts to ensure consistency.
+- 🟡 **SUMZY**: Review concepts to ensure consistency.
 
 
 *Dashboard synchronized by OpenViking Gaps Analyzer*

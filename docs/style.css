@@ -1,17 +1,17 @@
 :root {
-    --bg-dark: #121212;
-    --card-bg: #1e1e1e;
-    --text-primary: #e0e0e0;
-    --text-sec: #a0a0a0;
+    --bg-dark: #0a0a0a;
+    --card-bg: #1a1a1c;
+    --text-primary: #f0f0f0;
+    --text-sec: #8e8e93;
     --accent: #d4af37; /* Gold */
-    --fail-red: #cf6679;
-    --pass-green: #03dac6;
+    --fail-red: #ff3b30;
+    --pass-green: #34c759;
 }
 
 body {
     background-color: var(--bg-dark);
     color: var(--text-primary);
-    font-family: 'Source Sans Pro', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,6 +19,7 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 20px;
+    -webkit-font-smoothing: antialiased;
 }
 
 .header {
@@ -28,7 +29,7 @@ body {
 
 .header h1 {
     font-family: 'Playfair Display', serif;
-    font-size: 3rem;
+    font-size: clamp(2rem, 8vw, 3.5rem);
     color: var(--accent);
     margin: 0 0 10px 0;
 }
@@ -39,22 +40,19 @@ body {
 }
 
 .flashcard-container {
-    perspective: 1000px;
+    perspective: 2000px;
     width: 600px;
     max-width: 100%;
     margin-bottom: 30px;
 }
 
 .flashcard {
-    background-color: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    border-radius: 12px;
-    min-height: 350px;
+    min-height: 400px;
     position: relative;
-    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-style: preserve-3d;
     cursor: pointer;
+    border-radius: 20px;
 }
 
 .flashcard.flipped {
@@ -65,7 +63,11 @@ body {
     position: absolute;
     width: 100%;
     height: 100%;
+    
+    /* FIX: Ensure backface visibility is strictly enforced */
+    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -73,51 +75,72 @@ body {
     padding: 40px;
     text-align: center;
     box-sizing: border-box;
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
+/* Back starts rotated */
 .back {
     transform: rotateY(180deg);
 }
 
+/* Visibility Fix for older browsers */
+.flashcard:not(.flipped) .back { pointer-events: none; opacity: 0; }
+.flashcard.flipped .front { pointer-events: none; opacity: 0; }
+.flashcard.flipped .back { opacity: 1; }
+.flashcard:not(.flipped) .front { opacity: 1; }
+
 .front h2, .back p {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
+    font-size: 1.6rem;
+    line-height: 1.4;
+    margin: 0;
 }
 
-.front .category {
-    font-size: 0.9rem;
+.category {
+    font-size: 0.75rem;
+    font-weight: 800;
     color: var(--accent);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 0.15em;
     position: absolute;
-    top: 20px;
+    top: 30px;
+}
+
+.tap-hint {
+    position: absolute;
+    bottom: 30px;
+    color: var(--text-sec);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
 }
 
 .controls {
     display: flex;
-    gap: 20px;
+    gap: 15px;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    transform: translateY(10px);
 }
 
 .controls.visible {
     opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
 }
 
 .btn {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.1rem;
+    padding: 14px 35px;
+    border-radius: 100px;
+    font-size: 1rem;
     cursor: pointer;
-    font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 700;
+    transition: all 0.2s ease;
     background: transparent;
-}
-
-.btn:active {
-    transform: scale(0.95);
+    text-transform: none;
 }
 
 .btn.pass {
@@ -127,7 +150,8 @@ body {
 
 .btn.pass:hover {
     background: var(--pass-green);
-    color: var(--bg-dark);
+    color: #000;
+    box-shadow: 0 0 20px rgba(52, 199, 89, 0.3);
 }
 
 .btn.fail {
@@ -137,10 +161,12 @@ body {
 
 .btn.fail:hover {
     background: var(--fail-red);
-    color: var(--bg-dark);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(255, 59, 48, 0.3);
 }
 
 @media (max-width: 600px) {
-    .flashcard-container { width: 100%; }
-    .front h2, .back p { font-size: 1.4rem; }
+    .flashcard-container { width: 95%; }
+    .flashcard { min-height: 350px; }
+    .front h2, .back p { font-size: 1.3rem; }
 }
