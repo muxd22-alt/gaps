@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     const container = document.getElementById('flashcard-container');
     const controls = document.getElementById('controls');
+    const btnNext = document.getElementById('btn-next');
     
     try {
         const res = await fetch('data.json');
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                 </div>
             `;
-            controls.classList.remove('visible');
+            controls.style.display = 'none';
             return;
         }
         
@@ -48,7 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         cardEl.addEventListener('click', () => {
             cardEl.classList.toggle('flipped');
             if (cardEl.classList.contains('flipped')) {
-                // Keep controls invisible until flipped
                 controls.classList.add('visible');
             } else {
                 controls.classList.remove('visible');
@@ -56,18 +56,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         container.appendChild(cardEl);
+        // Controls only show after flipping
         controls.classList.remove('visible');
+        controls.style.display = 'flex';
     }
     
-    document.getElementById('btn-pass').addEventListener('click', (e) => {
+    btnNext.addEventListener('click', (e) => {
         e.stopPropagation();
-        currentIndex++; 
-        renderCard(currentIndex); 
-    });
-
-    document.getElementById('btn-fail').addEventListener('click', (e) => {
-        e.stopPropagation();
-        // In a real SRS this would reset the timing algorithm
         currentIndex++; 
         renderCard(currentIndex); 
     });
